@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Tic Tac Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Setup Menu -->
+    <div id="setupScreen" class="menu-container">
+        <h1>Tic Tac Toe</h1>
+        
+        <!-- Arcade Hub Button -->
+        <button onclick="window.location.href='../index.html'" style="margin-bottom: 20px;">⬅ Back to Arcade</button>
+        
+        <label for="gameMode">Game Mode:</label>
+        <select id="gameMode">
+            <option value="pvp">Player vs Player</option>
+            <option value="pve">Player vs Computer</option>
+        </select>
+
+        <div id="nameInputs">
+            <input type="text" id="playerXName" placeholder="Player X Name" value="Player 1">
+            <input type="text" id="playerOName" placeholder="Player O Name" value="Player 2">
+        </div>
+
+        <div id="difficultySettings" style="display: none;">
+            <label for="difficulty">AI Difficulty:</label>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard (Unbeatable)</option>
+            </select>
+        </div>
+
+        <button id="startGameBtn">Start Game</button>
+        <button id="themeToggleMenuBtn" style="margin-top: 10px;">Toggle Theme 🌙</button>
+    </div>
+
+    <!-- Game Board -->
+    <div id="gameScreen" class="game-container" style="display: none;">
+        <h1>Tic Tac Toe</h1>
+        <h2 id="statusMessage">Player X's turn</h2>
+        
+        <div class="board">
+            <div data-cell-index="0" class="cell"></div>
+            <div data-cell-index="1" class="cell"></div>
+            <div data-cell-index="2" class="cell"></div>
+            <div data-cell-index="3" class="cell"></div>
+            <div data-cell-index="4" class="cell"></div>
+            <div data-cell-index="5" class="cell"></div>
+            <div data-cell-index="6" class="cell"></div>
+            <div data-cell-index="7" class="cell"></div>
+            <div data-cell-index="8" class="cell"></div>
+        </div>
+
+        <div class="controls">
+            <!-- Arcade Hub Button -->
+            <button onclick="window.location.href='../index.html'">🏠 Arcade</button>
+            
+            <button id="restartButton">Restart</button>
+            <button id="menuButton">Menu</button>
+            <button id="themeToggleGameBtn">Theme 🌙</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

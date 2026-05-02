@@ -1,0 +1,157 @@
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: #1e293b;
+    --board-light: #e2e8f0; 
+    --board-dark: #475569;  
+    --text-main: #f8fafc;
+    --accent-glow: #38bdf8;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Menu & UI Styling --- */
+.menu-container {
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.menu-container h1 { margin-top: 10px; }
+
+label { display: block; text-align: left; font-weight: bold; margin-top: 15px;}
+
+select, input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background-color: #0f172a;
+    color: white;
+    font-size: 1rem;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.play-btn {
+    width: 100%;
+    background-color: var(--accent-glow);
+    color: var(--bg-dark);
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.play-btn:hover { background-color: #7dd3fc; }
+
+.game-wrapper {
+    width: 100%;
+    max-width: 550px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.header-controls { display: flex; justify-content: space-between; }
+
+.back-btn, #restartBtn {
+    background-color: #334155;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-btn:hover, #restartBtn:hover { background-color: #475569; }
+
+.info-panel { text-align: center; }
+.info-panel h1 { margin: 0 0 5px 0; }
+.info-panel h2 { margin: 0; font-size: 1.2rem; }
+.white-turn { color: #f8fafc; }
+.black-turn { color: #94a3b8; }
+.system-message { color: #ef4444; font-weight: bold; min-height: 24px; margin-top: 5px; }
+
+/* --- The Chess Board --- */
+.board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 6px solid #1e293b;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    user-select: none; 
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.square.light { background-color: var(--board-light); color: var(--board-dark); }
+.square.dark { background-color: var(--board-dark); color: var(--board-light); }
+.square.drag-over { background-color: #fcd34d !important; }
+.square.in-check { background-color: #fca5a5 !important; box-shadow: inset 0 0 15px #ef4444; }
+
+/* --- The Pieces --- */
+.piece {
+    font-size: clamp(2rem, 8vw, 4rem); 
+    line-height: 1;
+    cursor: grab;
+    transition: transform 0.1s;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    z-index: 10;
+}
+
+.piece:active { cursor: grabbing; transform: scale(1.1); }
+.piece.white { color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+.piece.black { color: #000000; }
+
+/* --- Move Highlighting --- */
+.square.possible-move::after {
+    content: '';
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    background-color: var(--accent-glow);
+    opacity: 0.7;
+    border-radius: 50%;
+    pointer-events: none; /* Crucial: lets you click the square underneath */
+    z-index: 5;
+}
+
+/* If the possible move contains an enemy piece, make the highlight a ring instead */
+.square.possible-move:has(.piece)::after {
+    background-color: transparent;
+    border: 4px solid var(--accent-glow);
+    width: 80%;
+    height: 80%;
+    opacity: 0.8;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Arcade</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="arcade-header">
+        <!-- Flexbox container perfectly aligns icon and text -->
+        <div class="title-container">
+            <span class="title-icon">🎮</span>
+            <h1>Web Arcade</h1>
+        </div>
+        <p>Choose your game and start playing!</p>
+
+        <!-- Decorative Console Panel -->
+        <div class="console-panel">
+            <div class="d-pad">
+                <div class="d-up"></div>
+                <div class="d-right"></div>
+                <div class="d-down"></div>
+                <div class="d-left"></div>
+                <div class="d-center"></div>
+            </div>
+            
+            <div class="menu-buttons">
+                <div class="pill-btn select-btn"></div>
+                <div class="pill-btn start-btn"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <div class="action-btn btn-b"></div>
+                <div class="action-btn btn-a"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="games-grid">
+        <!-- Tic Tac Toe Card -->
+        <a href="tic-tac-toe/index.html" class="game-card">
+            <div class="card-icon">❌⭕</div>
+            <h2>Tic Tac Toe</h2>
+            <p>The classic 3x3 strategy game. Play against a friend or the unbeatable AI.</p>
+            <span class="play-btn">Play Now</span>
+        </a>
+
+        <!-- Checkers Card -->
+        <a href="checkers/index.html" class="game-card">
+            <div class="card-icon">🔴⚫</div>
+            <h2>Checkers</h2>
+            <p>Jump, capture, and king your pieces in this timeless board game.</p>
+            <span class="play-btn">Play Now</span>
+        </a>
+
+        <!-- Chess Card -->
+        <a href="chess/index.html" class="game-card">
+            <div class="card-icon">♟️🏰</div>
+            <h2>Chess</h2>
+            <p>The ultimate game of kings and queens. Play against a friend or test your skills against the Minimax AI.</p>
+            <span class="play-btn">Play Now</span>
+        </a>
+    </main>
+
+    <!-- FOOTER SECTION -->
+    <footer class="arcade-footer">
+        <p>Created with 🎮 and ☕ by <strong>Parag Chatterjee</strong></p>
+        <p class="footer-sub">© 2026 Web Arcade | Play anytime, anywhere.</p>
+    </footer>
+
+</body>
+</html>

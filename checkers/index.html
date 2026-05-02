@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkers | Web Arcade</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Setup Menu -->
+    <div id="setupScreen" class="menu-container">
+        
+        <!-- Arcade Hub Button (Replaced Link) -->
+        <button onclick="window.location.href='../index.html'" class="back-btn" style="width: 100%; margin-bottom: 20px;">⬅ Back to Arcade</button>
+        
+        <h1>Checkers</h1>
+        
+        <label for="gameMode">Game Mode:</label>
+        <select id="gameMode">
+            <option value="pvp">Player vs Player</option>
+            <option value="pve">Player vs Computer</option>
+        </select>
+
+        <div class="name-inputs">
+            <input type="text" id="playerRedName" placeholder="Red Player Name" value="Player 1">
+            <input type="text" id="playerBlackName" placeholder="Black Player Name" value="Player 2">
+        </div>
+
+        <button id="startGameBtn" class="play-btn">Start Game</button>
+    </div>
+
+    <!-- Game Board -->
+    <div id="gameScreen" class="game-wrapper" style="display: none;">
+        <div class="header-controls">
+            
+            <!-- Arcade Hub Button (Replaced Link) -->
+            <button onclick="window.location.href='../index.html'" class="back-btn">🏠 Arcade</button>
+            
+            <button id="menuBtn" class="back-btn">⬅ Menu</button>
+            <button id="restartBtn">Restart</button>
+        </div>
+
+        <div class="info-panel">
+            <h1>Checkers</h1>
+            <h2 id="turnIndicator" class="red-turn">Red Player's Turn</h2>
+            <p id="systemMessage" class="system-message"></p>
+        </div>
+
+        <div id="board" class="board">
+            <!-- JavaScript generates squares -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
