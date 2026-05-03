@@ -4,60 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Arcade</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/fonts.css">
+    <link rel="stylesheet" href="assets/css/arcade.css">
+    <link rel="stylesheet" href="assets/css/theme-toggle.css">
+    <!-- Font Awesome CDN for Vector Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">Theme: Dark</button>
 
     <header class="arcade-header">
         <!-- Flexbox container perfectly aligns icon and text -->
         <div class="title-container">
-            <span class="title-icon">🎮</span>
+            <span class="title-icon"><i class="fa-solid fa-gamepad"></i></span>
             <h1>Web Arcade</h1>
         </div>
         <p>Choose your game and start playing!</p>
 
-        <!-- Decorative Console Panel -->
-        <div class="console-panel">
-            <div class="d-pad">
-                <div class="d-up"></div>
-                <div class="d-right"></div>
-                <div class="d-down"></div>
-                <div class="d-left"></div>
-                <div class="d-center"></div>
-            </div>
-            
-            <div class="menu-buttons">
-                <div class="pill-btn select-btn"></div>
-                <div class="pill-btn start-btn"></div>
-            </div>
-            
-            <div class="action-buttons">
-                <div class="action-btn btn-b"></div>
-                <div class="action-btn btn-a"></div>
-            </div>
-        </div>
     </header>
 
     <main class="games-grid">
         <!-- Tic Tac Toe Card -->
-        <a href="tic-tac-toe/index.html" class="game-card">
-            <div class="card-icon">❌⭕</div>
+        <a href="games/tic-tac-toe/index.html" class="game-card">
+            <div class="card-icon">
+                <i class="fa-solid fa-xmark" style="color: #ef4444;"></i>
+                <i class="fa-regular fa-circle" style="color: #38bdf8;"></i>
+            </div>
             <h2>Tic Tac Toe</h2>
             <p>The classic 3x3 strategy game. Play against a friend or the unbeatable AI.</p>
             <span class="play-btn">Play Now</span>
         </a>
 
         <!-- Checkers Card -->
-        <a href="checkers/index.html" class="game-card">
-            <div class="card-icon">🔴⚫</div>
+        <a href="games/checkers/index.html" class="game-card">
+            <div class="card-icon">
+                <i class="fa-solid fa-circle" style="color: #ef4444;"></i>
+                <i class="fa-solid fa-circle" style="color: #475569;"></i>
+            </div>
             <h2>Checkers</h2>
             <p>Jump, capture, and king your pieces in this timeless board game.</p>
             <span class="play-btn">Play Now</span>
         </a>
 
         <!-- Chess Card -->
-        <a href="chess/index.html" class="game-card">
-            <div class="card-icon">♟️🏰</div>
+        <a href="games/chess/index.html" class="game-card">
+            <div class="card-icon">
+                <i class="fa-solid fa-chess-pawn"></i>
+                <i class="fa-solid fa-chess-rook"></i>
+            </div>
             <h2>Chess</h2>
             <p>The ultimate game of kings and queens. Play against a friend or test your skills against the Minimax AI.</p>
             <span class="play-btn">Play Now</span>
@@ -66,9 +60,11 @@
 
     <!-- FOOTER SECTION -->
     <footer class="arcade-footer">
-        <p>Created with 🎮 and ☕ by <strong>Parag Chatterjee</strong></p>
+        <p>Created with <i class="fa-solid fa-gamepad" style="color: var(--accent-glow);"></i> and <i class="fa-solid fa-mug-hot" style="color: #d4d4d8;"></i> by <strong>Parag Chatterjee</strong></p>
         <p class="footer-sub">© 2026 Web Arcade | Play anytime, anywhere.</p>
     </footer>
+
+    <script src="assets/js/theme-toggle.js"></script>
 
 </body>
 </html>

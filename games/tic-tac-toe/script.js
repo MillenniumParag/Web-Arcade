@@ -5,13 +5,16 @@ const gameModeSelect = document.getElementById('gameMode');
 const playerONameInput = document.getElementById('playerOName');
 const difficultySettings = document.getElementById('difficultySettings');
 const difficultySelect = document.getElementById('difficulty');
+const timeControlSelect = document.getElementById('timeControl');
 const startGameBtn = document.getElementById('startGameBtn');
 const cells = document.querySelectorAll('.cell');
 const statusMessage = document.getElementById('statusMessage');
 const restartButton = document.getElementById('restartButton');
 const menuButton = document.getElementById('menuButton');
-const themeToggleMenuBtn = document.getElementById('themeToggleMenuBtn');
-const themeToggleGameBtn = document.getElementById('themeToggleGameBtn');
+const xTimerEl = document.getElementById('xTimer');
+const oTimerEl = document.getElementById('oTimer');
+const xTimerCard = document.getElementById('xTimerCard');
+const oTimerCard = document.getElementById('oTimerCard');
 
 // --- Game State Variables ---
 let board = ["", "", "", "", "", "", "", "", ""];
@@ -20,6 +23,12 @@ let gameActive = false;
 let mode = "pvp"; 
 let difficulty = "easy";
 let players = { X: "Player 1", O: "Player 2" };
+let timerSeconds = { X: 300, O: 300 };
+let activeTimerPlayer = "X";
+let timerInterval = null;
+let timerEnabled = true;
+let baseTimeSeconds = 300;
+let clockExpired = false;
 
 const winningConditions = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], 
@@ -27,24 +36,88 @@ const winningConditions = [
     [0, 4, 8], [2, 4, 6]             
 ];
 
-// --- Theme Toggling ---
-function toggleTheme() {
-    const rootElement = document.documentElement; 
-    const currentTheme = rootElement.getAttribute('data-theme');
-    const isDark = currentTheme === 'dark';
-    
-    if (isDark) {
-        rootElement.removeAttribute('data-theme');
-        themeToggleMenuBtn.textContent = "Toggle Theme 🌙";
-        themeToggleGameBtn.textContent = "Theme 🌙";
-    } else {
-        rootElement.setAttribute('data-theme', 'dark');
-        themeToggleMenuBtn.textContent = "Toggle Theme ☀️";
-        themeToggleGameBtn.textContent = "Theme ☀️";
+function formatTime(seconds) {
+    if (seconds === null) return '∞';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.max(0, seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function updateTimerUI() {
+    if (!timerEnabled) {
+        if (xTimerEl) xTimerEl.textContent = '∞';
+        if (oTimerEl) oTimerEl.textContent = '∞';
+        if (xTimerCard && oTimerCard) {
+            xTimerCard.classList.remove('active');
+            oTimerCard.classList.remove('active');
+        }
+        return;
+    }
+
+    if (xTimerEl) xTimerEl.textContent = formatTime(timerSeconds.X);
+    if (oTimerEl) oTimerEl.textContent = formatTime(timerSeconds.O);
+
+    if (xTimerCard && oTimerCard) {
+        xTimerCard.classList.toggle('active', activeTimerPlayer === 'X');
+        oTimerCard.classList.toggle('active', activeTimerPlayer === 'O');
     }
 }
-themeToggleMenuBtn.addEventListener('click', toggleTheme);
-themeToggleGameBtn.addEventListener('click', toggleTheme);
+
+function stopTimers() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function handleTimeOut(player) {
+    clockExpired = true;
+    gameActive = false;
+    stopTimers();
+    const winner = player === 'X' ? 'O' : 'X';
+    statusMessage.textContent = `${players[winner]} wins on time!`;
+}
+
+function startTimers() {
+    if (!timerEnabled) {
+        stopTimers();
+        updateTimerUI();
+        return;
+    }
+    stopTimers();
+    activeTimerPlayer = currentPlayer;
+    updateTimerUI();
+
+    timerInterval = setInterval(() => {
+        if (clockExpired || !gameActive) return;
+        timerSeconds[activeTimerPlayer] = Math.max(0, timerSeconds[activeTimerPlayer] - 1);
+        updateTimerUI();
+        if (timerSeconds[activeTimerPlayer] === 0) {
+            handleTimeOut(activeTimerPlayer);
+        }
+    }, 1000);
+}
+
+function switchTimer() {
+    if (!timerEnabled) {
+        updateTimerUI();
+        return;
+    }
+    activeTimerPlayer = currentPlayer;
+    updateTimerUI();
+}
+
+function resetTimers() {
+    timerSeconds = { X: baseTimeSeconds, O: baseTimeSeconds };
+    activeTimerPlayer = 'X';
+    clockExpired = false;
+    updateTimerUI();
+    if (timerEnabled) {
+        startTimers();
+    } else {
+        stopTimers();
+    }
+}
 
 // --- Menu Logic ---
 gameModeSelect.addEventListener('change', (e) => {
@@ -64,6 +137,14 @@ startGameBtn.addEventListener('click', () => {
     players.X = document.getElementById('playerXName').value || "Player 1";
     players.O = playerONameInput.value || "Player 2";
     difficulty = difficultySelect.value;
+    const selectedTime = timeControlSelect ? timeControlSelect.value : '5';
+    if (selectedTime === 'unlimited') {
+        timerEnabled = false;
+        baseTimeSeconds = 0;
+    } else {
+        timerEnabled = true;
+        baseTimeSeconds = Math.max(1, parseInt(selectedTime, 10)) * 60;
+    }
     
     setupScreen.style.display = "none";
     gameScreen.style.display = "block";
@@ -74,6 +155,7 @@ menuButton.addEventListener('click', () => {
     gameScreen.style.display = "none";
     setupScreen.style.display = "block";
     gameActive = false;
+    stopTimers();
 });
 
 // --- Gameplay Logic ---
@@ -81,7 +163,7 @@ function handleCellClick(event) {
     const clickedCell = event.target;
     const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
 
-    if (board[clickedCellIndex] !== "" || !gameActive || (mode === 'pve' && currentPlayer === "O")) {
+    if (board[clickedCellIndex] !== "" || !gameActive || clockExpired || (mode === 'pve' && currentPlayer === "O")) {
         return;
     }
     processMove(clickedCellIndex);
@@ -95,17 +177,20 @@ function processMove(index) {
     if (checkWinner(board, currentPlayer)) {
         statusMessage.textContent = `${players[currentPlayer]} has won!`;
         gameActive = false;
+        stopTimers();
         return;
     }
 
     if (!board.includes("")) {
         statusMessage.textContent = "Game ended in a draw!";
         gameActive = false;
+        stopTimers();
         return;
     }
 
     currentPlayer = currentPlayer === "X" ? "O" : "X";
     statusMessage.textContent = `${players[currentPlayer]}'s turn`;
+    switchTimer();
 
     if (mode === 'pve' && currentPlayer === "O" && gameActive) {
         setTimeout(makeAIMove, 500); 
@@ -114,6 +199,7 @@ function processMove(index) {
 
 // --- AI Logic ---
 function makeAIMove() {
+    if (clockExpired || !gameActive) return;
     let availableSpots = board.map((val, index) => val === "" ? index : null).filter(val => val !== null);
     let chosenIndex;
 
@@ -202,6 +288,7 @@ function restartGame() {
     board = ["", "", "", "", "", "", "", "", ""];
     statusMessage.textContent = `${players[currentPlayer]}'s turn`;
     gameActive = true;
+    resetTimers();
     cells.forEach(cell => {
         cell.textContent = "";
         cell.classList.remove("x-mark", "o-mark");

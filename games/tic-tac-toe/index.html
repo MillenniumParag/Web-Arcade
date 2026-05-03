@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ultimate Tic Tac Toe</title>
+    <link rel="stylesheet" href="../../assets/css/fonts.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../assets/css/theme-toggle.css">
 </head>
 <body>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">Theme: Dark</button>
 
     <!-- Setup Menu -->
     <div id="setupScreen" class="menu-container">
         <h1>Tic Tac Toe</h1>
         
         <!-- Arcade Hub Button -->
-        <button onclick="window.location.href='../index.html'" style="margin-bottom: 20px;">⬅ Back to Arcade</button>
+        <button onclick="window.location.href='../../index.html'" style="margin-bottom: 20px;">⬅ Back to Arcade</button>
         
         <label for="gameMode">Game Mode:</label>
         <select id="gameMode">
@@ -35,14 +38,34 @@
             </select>
         </div>
 
+        <label for="timeControl">Time Control:</label>
+        <select id="timeControl">
+            <option value="1">1 Minute</option>
+            <option value="3">3 Minutes</option>
+            <option value="5" selected>5 Minutes</option>
+            <option value="10">10 Minutes</option>
+            <option value="15">15 Minutes</option>
+            <option value="unlimited">No Limit</option>
+        </select>
+
         <button id="startGameBtn">Start Game</button>
-        <button id="themeToggleMenuBtn" style="margin-top: 10px;">Toggle Theme 🌙</button>
     </div>
 
     <!-- Game Board -->
     <div id="gameScreen" class="game-container" style="display: none;">
         <h1>Tic Tac Toe</h1>
         <h2 id="statusMessage">Player X's turn</h2>
+
+        <div class="timer-panel">
+            <div class="timer-card" id="xTimerCard">
+                <span class="timer-label">X</span>
+                <span id="xTimer" class="timer-value">05:00</span>
+            </div>
+            <div class="timer-card" id="oTimerCard">
+                <span class="timer-label">O</span>
+                <span id="oTimer" class="timer-value">05:00</span>
+            </div>
+        </div>
         
         <div class="board">
             <div data-cell-index="0" class="cell"></div>
@@ -58,14 +81,14 @@
 
         <div class="controls">
             <!-- Arcade Hub Button -->
-            <button onclick="window.location.href='../index.html'">🏠 Arcade</button>
+            <button onclick="window.location.href='../../index.html'">🏠 Arcade</button>
             
             <button id="restartButton">Restart</button>
             <button id="menuButton">Menu</button>
-            <button id="themeToggleGameBtn">Theme 🌙</button>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script src="../../assets/js/theme-toggle.js"></script>
 </body>
 </html>

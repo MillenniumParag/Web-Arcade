@@ -4,6 +4,7 @@ const gameScreen = document.getElementById('gameScreen');
 const gameModeSelect = document.getElementById('gameMode');
 const difficultySettings = document.getElementById('difficultySettings');
 const difficultySelect = document.getElementById('difficulty');
+const timeControlSelect = document.getElementById('timeControl');
 const playerWhiteNameInput = document.getElementById('playerWhiteName');
 const playerBlackNameInput = document.getElementById('playerBlackName');
 const startGameBtn = document.getElementById('startGameBtn');
@@ -12,6 +13,13 @@ const restartBtn = document.getElementById('restartBtn');
 const boardElement = document.getElementById('board');
 const turnIndicator = document.getElementById('turnIndicator');
 const systemMessage = document.getElementById('systemMessage');
+const whiteTimerEl = document.getElementById('whiteTimer');
+const blackTimerEl = document.getElementById('blackTimer');
+const whiteTimerCard = document.getElementById('whiteTimerCard');
+const blackTimerCard = document.getElementById('blackTimerCard');
+const whiteCapturesEl = document.getElementById('whiteCaptures');
+const blackCapturesEl = document.getElementById('blackCaptures');
+const lastMoveEl = document.getElementById('lastMove');
 
 // --- Game State ---
 let game = new Chess(); 
@@ -20,11 +28,133 @@ let difficulty = 'easy';
 let players = { w: "White", b: "Black" };
 let draggedSquare = null;
 let selectedSquare = null; // NEW: Tracks clicks
+let capturedByWhite = [];
+let capturedByBlack = [];
+let timerSeconds = { w: 300, b: 300 };
+let activeTimerColor = 'w';
+let timerInterval = null;
+let clockExpired = false;
+let timerEnabled = true;
+let baseTimeSeconds = 300;
 
 const piecesMap = {
     'wK': '♔', 'wQ': '♕', 'wR': '♖', 'wB': '♗', 'wN': '♘', 'wP': '♙',
     'bK': '♚', 'bQ': '♛', 'bR': '♜', 'bB': '♝', 'bN': '♞', 'bP': '♟'
 };
+
+
+function formatTime(seconds) {
+    if (seconds === null) return '∞';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.max(0, seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+
+function updateTimerUI() {
+    if (!timerEnabled) {
+        if (whiteTimerEl) whiteTimerEl.textContent = '∞';
+        if (blackTimerEl) blackTimerEl.textContent = '∞';
+        if (whiteTimerCard && blackTimerCard) {
+            whiteTimerCard.classList.remove('active');
+            blackTimerCard.classList.remove('active');
+        }
+        return;
+    }
+
+    if (whiteTimerEl) whiteTimerEl.textContent = formatTime(timerSeconds.w);
+    if (blackTimerEl) blackTimerEl.textContent = formatTime(timerSeconds.b);
+
+    if (whiteTimerCard && blackTimerCard) {
+        whiteTimerCard.classList.toggle('active', activeTimerColor === 'w');
+        blackTimerCard.classList.toggle('active', activeTimerColor === 'b');
+    }
+}
+
+function stopTimers() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function handleTimeOut(color) {
+    clockExpired = true;
+    stopTimers();
+    const loserName = color === 'w' ? players.w : players.b;
+    const winnerName = color === 'w' ? players.b : players.w;
+    turnIndicator.textContent = `${winnerName} wins on time`;
+    turnIndicator.className = color === 'w' ? "black-turn" : "white-turn";
+    systemMessage.textContent = `${loserName} ran out of time.`;
+}
+
+function startTimers() {
+    if (!timerEnabled) {
+        stopTimers();
+        updateTimerUI();
+        return;
+    }
+    stopTimers();
+    activeTimerColor = game.turn();
+    updateTimerUI();
+
+    timerInterval = setInterval(() => {
+        if (clockExpired || game.game_over()) return;
+        timerSeconds[activeTimerColor] = Math.max(0, timerSeconds[activeTimerColor] - 1);
+        updateTimerUI();
+        if (timerSeconds[activeTimerColor] === 0) {
+            handleTimeOut(activeTimerColor);
+        }
+    }, 1000);
+}
+
+function switchTimer() {
+    if (!timerEnabled) {
+        updateTimerUI();
+        return;
+    }
+    activeTimerColor = game.turn();
+    updateTimerUI();
+}
+
+function resetTimers() {
+    timerSeconds = { w: baseTimeSeconds, b: baseTimeSeconds };
+    activeTimerColor = 'w';
+    clockExpired = false;
+    updateTimerUI();
+    if (timerEnabled) {
+        startTimers();
+    } else {
+        stopTimers();
+    }
+}
+
+function renderCapturedPieces() {
+    if (!whiteCapturesEl || !blackCapturesEl) return;
+
+    whiteCapturesEl.innerHTML = capturedByWhite
+        .map(code => `<span class="capture-piece">${piecesMap[code]}</span>`)
+        .join('');
+    blackCapturesEl.innerHTML = capturedByBlack
+        .map(code => `<span class="capture-piece">${piecesMap[code]}</span>`)
+        .join('');
+}
+
+function recordCapture(move) {
+    if (!move.captured) return;
+    const capturedColor = move.color === 'w' ? 'b' : 'w';
+    const capturedCode = `${capturedColor}${move.captured.toUpperCase()}`;
+    if (move.color === 'w') {
+        capturedByWhite.push(capturedCode);
+    } else {
+        capturedByBlack.push(capturedCode);
+    }
+    renderCapturedPieces();
+}
+
+function isInputLocked() {
+    return game.game_over() || clockExpired || (mode === 'pve' && game.turn() === 'b');
+}
 
 // --- Menu Logic ---
 gameModeSelect.addEventListener('change', (e) => {
@@ -44,6 +174,14 @@ startGameBtn.addEventListener('click', () => {
     players.w = playerWhiteNameInput.value || "White";
     players.b = playerBlackNameInput.value || "Black";
     difficulty = difficultySelect.value;
+    const selectedTime = timeControlSelect ? timeControlSelect.value : '5';
+    if (selectedTime === 'unlimited') {
+        timerEnabled = false;
+        baseTimeSeconds = 0;
+    } else {
+        timerEnabled = true;
+        baseTimeSeconds = Math.max(1, parseInt(selectedTime, 10)) * 60;
+    }
     setupScreen.style.display = "none";
     gameScreen.style.display = "flex";
     initGame();
@@ -52,6 +190,7 @@ startGameBtn.addEventListener('click', () => {
 menuBtn.addEventListener('click', () => {
     gameScreen.style.display = "none";
     setupScreen.style.display = "block";
+    stopTimers();
 });
 
 restartBtn.addEventListener('click', initGame);
@@ -60,12 +199,18 @@ restartBtn.addEventListener('click', initGame);
 function initGame() {
     game.reset(); 
     selectedSquare = null;
+    capturedByWhite = [];
+    capturedByBlack = [];
+    renderCapturedPieces();
+    if (lastMoveEl) lastMoveEl.textContent = "None";
     systemMessage.textContent = "";
+    resetTimers();
     updateStatus();
     renderBoard();
 }
 
 function updateStatus() {
+    if (clockExpired) return;
     let statusHTML = '';
     let moveColor = game.turn() === 'w' ? 'White' : 'Black';
     let currentPlayerName = game.turn() === 'w' ? players.w : players.b;
@@ -78,6 +223,10 @@ function updateStatus() {
     else if (game.in_check()) statusHTML = 'Check!';
     
     systemMessage.textContent = statusHTML;
+
+    if (game.game_over()) {
+        stopTimers();
+    }
 }
 
 // NEW Utility: Clears all blue dots from the board
@@ -115,7 +264,7 @@ function renderBoard() {
                 // Drag & Drop
                 piece.draggable = true;
                 piece.addEventListener('dragstart', (e) => {
-                    if (game.game_over() || (mode === 'pve' && game.turn() === 'b')) {
+                    if (isInputLocked()) {
                         e.preventDefault();
                         return;
                     }
@@ -128,7 +277,7 @@ function renderBoard() {
 
             // --- CLICK TO MOVE LOGIC ---
             square.addEventListener('click', () => {
-                if (game.game_over() || (mode === 'pve' && game.turn() === 'b')) return;
+                if (isInputLocked()) return;
 
                 // 1. If we clicked a highlighted square, execute the move!
                 if (square.classList.contains('possible-move') && selectedSquare) {
@@ -165,6 +314,8 @@ function renderBoard() {
             square.addEventListener('drop', (e) => {
                 e.preventDefault();
                 square.classList.remove('drag-over');
+
+                if (isInputLocked()) return;
                 
                 let targetSquare = e.target.dataset.square;
                 if (!targetSquare) targetSquare = e.target.parentElement.dataset.square;
@@ -188,18 +339,27 @@ function handleMove(source, target) {
 
     if (move === null) return; 
 
+    applyMove(move);
+}
+
+function applyMove(move) {
     selectedSquare = null; // Reset clicks after move
+    recordCapture(move);
+    if (lastMoveEl) lastMoveEl.textContent = move.san;
     renderBoard();
+    switchTimer();
     updateStatus();
 
-    if (!game.game_over() && mode === 'pve' && game.turn() === 'b') {
+    if (game.game_over() || clockExpired) return;
+
+    if (mode === 'pve' && game.turn() === 'b') {
         window.setTimeout(makeAIMove, 400);
     }
 }
 
 // --- Computer AI Logic ---
 function makeAIMove() {
-    if (game.game_over()) return;
+    if (game.game_over() || clockExpired) return;
 
     const possibleMoves = game.moves();
     if (possibleMoves.length === 0) return;
@@ -208,7 +368,6 @@ function makeAIMove() {
 
     if (difficulty === 'easy') {
         chosenMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        game.move(chosenMove);
     } 
     else if (difficulty === 'medium') {
         const captures = possibleMoves.filter(m => m.includes('x'));
@@ -217,15 +376,14 @@ function makeAIMove() {
         } else {
             chosenMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
         }
-        game.move(chosenMove);
     } 
     else if (difficulty === 'hard') {
         chosenMove = getBestMove(game, 2);
-        game.move(chosenMove);
     }
 
-    renderBoard();
-    updateStatus();
+    const move = game.move(chosenMove);
+    if (!move) return;
+    applyMove(move);
 }
 
 function evaluateBoard(gameObj) {

@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@font-face {
+    font-family: "Pixel Gamer";
+    src: url("../fonts/pixelgamerpersonaluse-rg61l.otf") format("opentype");
+    font-display: swap;
+}
+
+:root {
+    --font-display: "Pixel Gamer", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --font-body: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}

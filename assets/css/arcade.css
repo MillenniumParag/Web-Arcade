@@ -1,0 +1,433 @@
+/* --- Global Reset & Variables --- */
+:root {
+    --bg-start: #0b1120;
+    --bg-end: #0f1a2b;
+    --panel: #18253d;
+    --panel-2: #223353;
+    --panel-border: rgba(94, 118, 160, 0.35);
+    --text-main: #f8fbff;
+    --text-muted: #9bb3cc;
+    --accent: #21f0c7;
+    --accent-glow: #21f0c7;
+    --accent-2: #ffb020;
+    --shadow-lg: 0 20px 45px rgba(6, 12, 25, 0.55);
+    --shadow-md: 0 12px 25px rgba(6, 12, 25, 0.45);
+    --glow: 0 0 25px rgba(33, 240, 199, 0.35);
+    --grid-line: rgba(255, 255, 255, 0.05);
+    --grid-line-soft: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] {
+    --bg-start: #f8fafc;
+    --bg-end: #e2e8f0;
+    --panel: #ffffff;
+    --panel-2: #f1f5f9;
+    --panel-border: rgba(148, 163, 184, 0.6);
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --accent: #0ea5e9;
+    --accent-glow: #0ea5e9;
+    --accent-2: #f97316;
+    --shadow-lg: 0 18px 35px rgba(15, 23, 42, 0.15);
+    --shadow-md: 0 10px 22px rgba(15, 23, 42, 0.12);
+    --glow: 0 0 18px rgba(14, 165, 233, 0.35);
+    --grid-line: rgba(15, 23, 42, 0.06);
+    --grid-line-soft: rgba(15, 23, 42, 0.04);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    background:
+        radial-gradient(1000px circle at 10% -10%, rgba(33, 240, 199, 0.18), transparent 55%),
+        radial-gradient(900px circle at 90% 0%, rgba(255, 176, 32, 0.15), transparent 60%),
+        linear-gradient(180deg, var(--bg-start), var(--bg-end) 55%, #0a1220 100%);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 80px),
+        repeating-linear-gradient(0deg, var(--grid-line-soft) 0 1px, transparent 1px 80px);
+    opacity: 0.25;
+    z-index: -2;
+    pointer-events: none;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: -120px;
+    right: -120px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(255, 176, 32, 0.22), transparent 65%);
+    filter: blur(10px);
+    opacity: 0.8;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* --- Header & Title Alignment --- */
+.arcade-header {
+    text-align: center;
+    margin-top: clamp(24px, 6vw, 60px);
+    margin-bottom: clamp(26px, 6vw, 52px);
+    width: 100%;
+    padding: 0 16px;
+    animation: header-rise 0.7s ease both;
+}
+
+.title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.title-icon {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    color: var(--accent);
+    filter: drop-shadow(0 0 12px rgba(33, 240, 199, 0.45));
+    animation: icon-pulse 3s ease-in-out infinite;
+}
+
+.arcade-header h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #fef08a, var(--accent), #72f6e2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+    text-shadow: 0 10px 25px rgba(5, 10, 22, 0.6);
+}
+
+.arcade-header p {
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2.6vw, 1.2rem);
+    margin: 12px auto 0;
+    max-width: 640px;
+}
+
+/* --- Grid Layout --- */
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(18px, 3vw, 32px);
+    width: min(1100px, 92vw);
+    padding-bottom: clamp(20px, 4vw, 36px);
+}
+
+/* --- Game Card Styling --- */
+.game-card {
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+    border-radius: 18px;
+    padding: clamp(22px, 3vw, 32px);
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    border: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    animation: card-rise 0.7s ease both;
+}
+
+.game-card:nth-child(1) { animation-delay: 0.05s; }
+.game-card:nth-child(2) { animation-delay: 0.15s; }
+.game-card:nth-child(3) { animation-delay: 0.25s; }
+
+.game-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 120% at 0% 0%, rgba(33, 240, 199, 0.18), transparent 60%);
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.game-card:hover:not(.disabled) {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(33, 240, 199, 0.6);
+    box-shadow: 0 20px 40px rgba(6, 12, 25, 0.6), 0 0 22px rgba(33, 240, 199, 0.3);
+}
+
+.card-icon {
+    font-size: clamp(3rem, 6vw, 4rem);
+    margin-bottom: 16px;
+    filter: drop-shadow(0 8px 14px rgba(6, 12, 25, 0.45));
+}
+
+.game-card h2 {
+    margin: 0 0 10px 0;
+    font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.game-card p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    flex-grow: 1;
+}
+
+/* --- Play Buttons --- */
+.play-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #5ff3de);
+    color: #051223;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(6, 18, 35, 0.35);
+    box-shadow: var(--glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-card:hover:not(.disabled) .play-btn {
+    transform: translateY(-1px);
+    box-shadow: 0 0 28px rgba(33, 240, 199, 0.45);
+}
+
+/* --- Coming Soon (Disabled) State --- */
+.game-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(80%);
+}
+
+.play-btn.locked {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: #e2e8f0;
+    box-shadow: none;
+}
+
+/* --- Footer Styling --- */
+.arcade-footer {
+    text-align: center;
+    margin-top: auto;
+    padding: clamp(24px, 4vw, 48px) 20px 20px;
+    color: var(--text-muted);
+}
+
+.arcade-footer p {
+    margin: 6px 0;
+    font-size: 1rem;
+}
+
+.arcade-footer strong {
+    color: var(--accent);
+    letter-spacing: 1px;
+}
+
+.footer-sub {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* --- Decorative Console Panel --- */
+.console-panel {
+    margin: 28px auto 0;
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--panel-border);
+    border-radius: 40px;
+    width: min(520px, 90vw);
+    height: 110px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 36px;
+    box-shadow: var(--shadow-md);
+    animation: panel-rise 0.75s ease both;
+    animation-delay: 0.1s;
+}
+
+/* 1. The D-Pad */
+.d-pad {
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.d-pad div {
+    background-color: var(--bg-start);
+    position: absolute;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.12), 0 4px 5px rgba(0, 0, 0, 0.45);
+}
+
+.d-up { width: 22px; height: 26px; left: 19px; top: 0; }
+.d-down { width: 22px; height: 26px; left: 19px; bottom: 0; }
+.d-left { width: 26px; height: 22px; top: 19px; left: 0; }
+.d-right { width: 26px; height: 22px; top: 19px; right: 0; }
+.d-center {
+    width: 22px; height: 22px; top: 19px; left: 19px;
+    background-color: var(--panel-2);
+    box-shadow: none;
+}
+
+/* 2. Start / Select Buttons */
+.menu-buttons {
+    display: flex;
+    gap: 15px;
+    transform: rotate(-20deg) translateY(12px);
+}
+
+.pill-btn {
+    width: 34px;
+    height: 12px;
+    background-color: var(--bg-end);
+    border-radius: 10px;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.7), 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+/* 3. A / B Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    transform: rotate(-20deg);
+}
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.55), inset 0 -3px 5px rgba(0, 0, 0, 0.4);
+    position: relative;
+    background: radial-gradient(circle at 30% 30%, #ff5e5b, #be123c);
+}
+
+.action-btn::after {
+    content: "";
+    position: absolute;
+    top: 5px; left: 7px;
+    width: 10px; height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: rotate(-45deg);
+}
+
+.btn-b { margin-top: 14px; }
+.btn-a { margin-bottom: 14px; }
+
+@media (max-width: 720px) {
+    .console-panel {
+        height: 96px;
+        padding: 0 24px;
+    }
+
+    .games-grid {
+        width: min(1000px, 94vw);
+    }
+}
+
+@media (max-width: 600px) {
+    .title-container {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .console-panel {
+        height: 86px;
+        padding: 0 20px;
+    }
+
+    .d-pad {
+        width: 50px;
+        height: 50px;
+    }
+
+    .d-up,
+    .d-down {
+        width: 18px;
+        height: 22px;
+        left: 16px;
+    }
+
+    .d-left,
+    .d-right {
+        width: 22px;
+        height: 18px;
+        top: 16px;
+    }
+
+    .d-center {
+        width: 18px;
+        height: 18px;
+        top: 16px;
+        left: 16px;
+    }
+
+    .menu-buttons,
+    .action-buttons {
+        gap: 10px;
+    }
+}
+
+@keyframes header-rise {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes card-rise {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes panel-rise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes icon-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
